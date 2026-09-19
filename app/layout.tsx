@@ -26,10 +26,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <main className="mx-auto max-w-7xl px-4">
+        <main className="px-4">
           <NavArea />
           <Separator />
-          <div className="min-h-screen">{children}</div>
+          <div>{children}</div>
         </main>
       </body>
     </html>
