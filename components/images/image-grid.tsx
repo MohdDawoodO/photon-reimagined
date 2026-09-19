@@ -4,22 +4,24 @@ import { DisplayPhotoType, ErrorType, Photos } from "@/lib/types";
 import { useEffect, useState } from "react";
 import ImageComponent from "@/components/images/image";
 import Masonry from "react-masonry-css";
-import { showMorePhotos } from "@/actions/get-photos";
+import { showMorePhotos, showMoreSearchedPhotos } from "@/actions/get-photos";
 import { LoaderIcon } from "lucide-react";
 
 export default function ImageGrid({
   photos,
   searchPage,
   query,
+  error,
 }: {
-  photos: DisplayPhotoType[];
+  photos?: DisplayPhotoType[];
   searchPage?: boolean;
   query?: string;
+  error?: string | null;
 }) {
   const [images, setImages] = useState<DisplayPhotoType[]>([]);
   const [calling, setCalling] = useState(false);
   const [page, setPage] = useState(1);
-  const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const breakpointColumnsObj = {
     default: 3,
@@ -29,18 +31,13 @@ export default function ImageGrid({
 
   useEffect(() => {
     (async function () {
-      setImages(photos);
+      if (photos) setImages(photos);
+      if (error) setErrorMessage(error);
     })();
-  }, [photos]);
+  }, [photos, error]);
 
   useEffect(() => {
-    async function showMore() {
-      if (searchPage && query) {
-        return;
-      }
-
-      const response: Photos & ErrorType = await showMorePhotos(page);
-
+    function setImagesState(response: Photos & ErrorType) {
       if (!response.error) {
         const photosToDisplay = response.photos.map((photo) => ({
           src: photo.src.large2x,
@@ -49,11 +46,26 @@ export default function ImageGrid({
         }));
         setImages([...images, ...photosToDisplay]);
       } else {
-        setError(response.error);
+        setErrorMessage(response.error);
       }
 
       setPage(page + 1);
       setCalling(false);
+    }
+
+    async function showMore() {
+      if (searchPage && query) {
+        const response: Photos & ErrorType = await showMoreSearchedPhotos(
+          page,
+          query,
+        );
+        setImagesState(response);
+
+        return;
+      }
+
+      const response: Photos & ErrorType = await showMorePhotos(page);
+      setImagesState(response);
     }
 
     async function scrollEvent() {
@@ -72,26 +84,27 @@ export default function ImageGrid({
 
   return (
     <div className="mx-auto max-w-7xl py-8">
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="my-masonry-grid"
-        columnClassName="my-masonry-grid_column"
-      >
-        {images.map((image) => (
-          <ImageComponent
-            key={image.id}
-            alt={image.alt!}
-            src={image.src}
-            id={image.id}
-          />
-        ))}
-      </Masonry>
-
+      {images && (
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="my-masonry-grid"
+          columnClassName="my-masonry-grid_column"
+        >
+          {images.map((image) => (
+            <ImageComponent
+              key={image.id}
+              alt={image.alt!}
+              src={image.src}
+              id={image.id}
+            />
+          ))}
+        </Masonry>
+      )}
       <div className="flex min-h-20 w-full items-center justify-center pt-5">
-        {!error ? (
+        {!errorMessage ? (
           <LoaderIcon className="animate-spin" />
         ) : (
-          <p className="text-destructive">{error}</p>
+          <p className="text-destructive">{errorMessage}</p>
         )}
       </div>
     </div>

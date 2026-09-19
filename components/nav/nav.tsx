@@ -6,7 +6,7 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { FaDiscord, FaGithub } from "react-icons/fa";
 
@@ -16,6 +16,7 @@ export default function Nav() {
   const [isOpen, setIsOpen] = useState(false);
   const searchBarRef = useRef<HTMLFormElement | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     function scrollEvent() {
@@ -53,7 +54,7 @@ export default function Nav() {
               Photon
             </h1>
           </Link>
-          {showStickyNav && isOpen && (
+          {(showStickyNav || pathname.includes("/image/")) && isOpen && (
             <Button
               size="icon"
               variant="outline"
@@ -62,7 +63,7 @@ export default function Nav() {
               <ArrowLeftIcon />
             </Button>
           )}
-          {showStickyNav && (
+          {(showStickyNav || pathname.includes("/image/")) && (
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -88,7 +89,7 @@ export default function Nav() {
             </form>
           )}
           <div className={cn("flex gap-2", isOpen && "hidden")}>
-            {showStickyNav && (
+            {(showStickyNav || pathname.includes("/image/")) && (
               <Button
                 size="icon-sm"
                 variant="secondary"
@@ -111,45 +112,46 @@ export default function Nav() {
           </div>
         </div>
       </nav>
-
-      <div className="flex min-h-[30vh] items-center justify-center">
-        <div className="flex w-full flex-col items-center gap-6">
-          <div className="flex flex-col items-center">
-            <Link href="/">
-              <h1 className="abhaya-libre-semibold hover:text-foreground/80 text-3xl duration-300 lg:text-4xl">
-                Photon
-              </h1>
-            </Link>
-            <p className="text-muted-foreground text-sm lg:text-base">
-              Discover and download beautiful photos.
-            </p>
+      {(pathname === "/" || pathname.includes("/search")) && (
+        <div className="flex min-h-[30vh] items-center justify-center">
+          <div className="flex w-full flex-col items-center gap-6">
+            <div className="flex flex-col items-center">
+              <Link href="/">
+                <h1 className="abhaya-libre-semibold hover:text-foreground/80 text-3xl duration-300 lg:text-4xl">
+                  Photon
+                </h1>
+              </Link>
+              <p className="text-muted-foreground text-sm lg:text-base">
+                Discover and download beautiful photos.
+              </p>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                onSubmit();
+              }}
+              ref={searchBarRef}
+              className="flex w-full max-w-md justify-center lg:max-w-lg"
+            >
+              <ButtonGroup className="w-full">
+                <Input
+                  placeholder="Seach for photos..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="flex-1 md:px-3 md:py-4 md:text-base lg:py-5"
+                />
+                <Button
+                  size="icon"
+                  type="submit"
+                  className="aspect-square md:py-4 lg:p-5"
+                >
+                  <SearchIcon />
+                </Button>
+              </ButtonGroup>
+            </form>
           </div>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit();
-            }}
-            ref={searchBarRef}
-            className="flex w-full max-w-md justify-center lg:max-w-lg"
-          >
-            <ButtonGroup className="w-full">
-              <Input
-                placeholder="Seach for photos..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="flex-1 md:px-3 md:py-4 md:text-base lg:py-5"
-              />
-              <Button
-                size="icon"
-                type="submit"
-                className="aspect-square md:py-4 lg:p-5"
-              >
-                <SearchIcon />
-              </Button>
-            </ButtonGroup>
-          </form>
         </div>
-      </div>
+      )}
     </>
   );
 }
