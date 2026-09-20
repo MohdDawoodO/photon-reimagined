@@ -1,22 +1,25 @@
 "use client";
 
 import { DisplayPhotoType, ErrorType, Photos } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import ImageComponent from "@/components/images/image";
 import Masonry from "react-masonry-css";
 import { showMorePhotos, showMoreSearchedPhotos } from "@/actions/get-photos";
 import { LoaderIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function ImageGrid({
   photos,
   searchPage,
   query,
   error,
+  className,
 }: {
   photos?: DisplayPhotoType[];
   searchPage?: boolean;
   query?: string;
   error?: string | null;
+  className?: string;
 }) {
   const [images, setImages] = useState<DisplayPhotoType[]>([]);
   const [calling, setCalling] = useState(false);
@@ -36,7 +39,7 @@ export default function ImageGrid({
     })();
   }, [photos, error]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     function setImagesState(response: Photos & ErrorType) {
       if (!response.error) {
         const photosToDisplay = response.photos.map((photo) => ({
@@ -83,7 +86,7 @@ export default function ImageGrid({
   }, [calling, page, query, searchPage, images]);
 
   return (
-    <div className="mx-auto max-w-7xl py-8">
+    <div className={cn("mx-auto max-w-7xl py-8", className)}>
       {images && (
         <Masonry
           breakpointCols={breakpointColumnsObj}

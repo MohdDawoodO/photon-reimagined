@@ -11,7 +11,7 @@ export default function ImageComponent({
   id: number;
 }) {
   return (
-    <Link href={`/image/${id}`}>
+    <Link href={`/image/${id}`} scroll={false}>
       <Image
         src={src}
         alt={alt}

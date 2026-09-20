@@ -19,6 +19,10 @@ export default function Nav() {
   const pathname = usePathname();
 
   useEffect(() => {
+    (async function setState() {
+      setShowStickyNav(false);
+    })();
+
     function scrollEvent() {
       if (!searchBarRef.current) return;
       const searchBarData = searchBarRef.current.getBoundingClientRect();
@@ -33,10 +37,11 @@ export default function Nav() {
 
     window.addEventListener("scroll", scrollEvent);
     return () => window.removeEventListener("scroll", scrollEvent);
-  }, []);
+  }, [pathname]);
 
   function onSubmit() {
     if (searchInput.length < 3) return;
+    scrollTo(0, 0);
     router.push(`/search?q=${searchInput}`);
   }
 

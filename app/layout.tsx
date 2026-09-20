@@ -22,8 +22,10 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  modal,
 }: {
   children: ReactNode;
+  modal: ReactNode;
 }) {
   return (
     <html
@@ -34,6 +36,7 @@ export default async function RootLayout({
         <main className="px-4">
           <NavArea />
           <Separator />
+          <div>{modal}</div>
           <div>{children}</div>
         </main>
       </body>
