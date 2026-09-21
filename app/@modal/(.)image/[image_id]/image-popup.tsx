@@ -28,13 +28,16 @@ export default function ImagePopup({
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflowY = "auto";
+    };
   }, []);
 
   return (
     <div
       className="fixed top-0 left-0 z-200 flex h-full w-full items-center justify-center bg-black/90 px-4 py-8"
       onClick={() => {
-        document.body.style.overflowY = "auto";
         router.back();
       }}
     >
